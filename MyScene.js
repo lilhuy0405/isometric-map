@@ -1,119 +1,178 @@
-import * as Phaser from "phaser";
+import {Scene} from "phaser";
 
-class MyScene extends Phaser.Scene {
+
+class MyScene extends Scene {
   constructor() {
     super({
       key: 'MyScene',
       physics: {
-        default: 'matter',
-        matter: {
-          gravity: {x: 0, y: 0},
-          debug: false
+        default: 'arcade',
+        arcade: {
+          debug: true,
+          gravity: {x: 0, y: 0, z: 0}
         }
-      },
+      }
     })
-
-
   }
 
   preload() {
-    //load tileset images
-    this.load.image("ground-tileset", "assets/ground.png");
-    this.load.image("bridges-tileset", "assets/bridges.png");
-    this.load.image("trees-tileset", "assets/trees.png");
-    this.load.image("houses-tileset", "assets/houses.png");
-    this.load.image("houses1-tileset", "assets/houses1.png");
-    this.load.tilemapTiledJSON('map', 'assets/map.json');
-    //load character sprite sheet
-    this.load.spritesheet('dude',
-      'assets/dude.png',
-      {frameWidth: 32, frameHeight: 48}
-    );
+    this.load.image('tiles', 'assets/tileset.png');
+    this.load.tilemapTiledJSON('map', 'assets/demo.json');
+
+    this.load.spritesheet("player", "assets/spritesheet.png", {
+      frameWidth: 299,
+      frameHeight: 240
+    });
+
+    this.load.spritesheet("dude", "assets/dude.png", {
+      frameWidth: 32,
+      frameHeight: 48
+    });
 
   }
 
   create() {
-    // console.log(this.cache.tilemap.get('map').data);
-    const map = this.make.tilemap({key: 'map'});
-    console.log(map);
 
-    //add tileset to map addTilesetImage(key-from-map.json, image-key-from-preload)
-    const groundTileSet = map.addTilesetImage('grounds', 'ground-tileset');
-    const bridgesTileSet = map.addTilesetImage('bridges', 'bridges-tileset');
-    const treesTileSet = map.addTilesetImage('tree', 'trees-tileset');
-    const housesTileset = map.addTilesetImage('houses', 'houses-tileset');
-    const houses1TileSet = map.addTilesetImage('houses1', 'houses1-tileset');
+    const map = this.add.tilemap('map');
+    const groundTiles = map.addTilesetImage('Isometirc-Template', 'tiles');
 
-    //add layer to map createLayer(key-from-map.json, [tileset list])
-    const groundLayer = map.createLayer('Grounds', [groundTileSet]);
-    const propsLayer = map.createLayer('Props', [bridgesTileSet, treesTileSet, housesTileset, houses1TileSet]);
-    const collisionLayer = map.createLayer('Collisions', [groundTileSet]);
-    this.player = this.matter.add.sprite(100, 450, 'dude');
-    //create anims for character
+    const layer1 = map.createLayer('Bottom', [groundTiles]);
+    const layer2 = map.createLayer('Top', [groundTiles]);
+
+    this.player = this.physics.add.sprite(0, 200, 'player');
+    this.player.setScale(0.3)
+    //create anims
     this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 3}),
-      frameRate: 20,
+      key: 'S',
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 3}),
+      frameRate: 10,
       repeat: -1
     });
-
     this.anims.create({
-      key: 'turn',
-      frames: [{key: 'dude', frame: 4}],
-      frameRate: 20
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', {start: 5, end: 8}),
-      frameRate: 20,
+      key: 'SE',
+      frames: this.anims.generateFrameNumbers('player', {start: 4, end: 7}),
+      frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'E',
+      frames: this.anims.generateFrameNumbers('player', {start: 8, end: 11}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'NE',
+      frames: this.anims.generateFrameNumbers('player', {start: 12, end: 15}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'N',
+      frames: this.anims.generateFrameNumbers('player', {start: 16, end: 19}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'NW',
+      frames: this.anims.generateFrameNumbers('player', {start: 20, end: 23}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'W',
+      frames: this.anims.generateFrameNumbers('player', {start: 24, end: 27}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'SW',
+      frames: this.anims.generateFrameNumbers('player', {start: 28, end: 31}),
+      frameRate: 10,
+      repeat: -1
+    });
+    //  this.player.setCollideWorldBounds(true);
 
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.matter.world.createDebugGraphic();
+    this.cameras.main.setZoom(2);
+    this.cameras.main.startFollow(this.player)
 
-    //this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.setZoom(0.5);
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-    //collision detection
-    // property "collides" is set on certain tiles within Tiled
-    collisionLayer.setCollisionByProperty({ collides: true })
-    this.matter.world.convertTilemapLayer(collisionLayer)
+    this.target = new Phaser.Math.Vector2();
+    this.input.on(Phaser.Input.Events.POINTER_UP, (pointer) => {
+      const {worldX, worldY} = pointer
 
-    // const controlConfig = {
-    //   camera: this.cameras.main,
-    //   left: cursors.left,
-    //   right: cursors.right,
-    //   up: cursors.up,
-    //   down: cursors.down,
-    //   acceleration: 0.04,
-    //   drag: 0.0005,
-    //   maxSpeed: 0.7
-    // };
-    //
-    // this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
+      const startVec = layer1.worldToTileXY(this.player.x, this.player.y)
+      const targetVec = layer1.worldToTileXY(worldX, worldY)
 
+      this.target.x = worldX;
+      this.target.y = worldY;
+      this.physics.moveToObject(this.player, this.target, 150);
+      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.target.x, this.target.y);
+      const cosAngle = (this.target.y - this.player.y) / distance
+      let degree = this.fromRadianToDegree(Math.acos(cosAngle))
+      if (this.target.x < this.player.x) {
+        degree = 360 - degree
+      }
+      const direction = this.detectDirection(degree)
+      switch (direction) {
+        case "N":
+          this.player.anims.play("N")
+          break;
+        case "NE":
+          this.player.anims.play("NE")
+          break;
+        case "E":
+          this.player.anims.play("E")
+          break;
+        case "SE":
+          this.player.anims.play("SE")
+          break;
+        case "S":
+          this.player.anims.play("S")
+          break;
+        case "SW":
+          this.player.anims.play("SW")
+          break;
+        case "W":
+          this.player.anims.play("W")
+          break
+        case "NW":
+          this.player.anims.play("NW")
+          break
+      }
+    })
+
+    // remember to clean up on Scene shutdown
+    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.input.off(Phaser.Input.Events.POINTER_UP)
+    })
   }
 
   update(time, delta) {
-    this.player.setVelocity(0);
+    const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.target.x, this.target.y);
 
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-5);
-
-    } else if (this.cursors.right.isDown) {
-      this.player.setAngle(0).setVelocityX(5);
-
+    if (this.player.body.speed > 0 && distance < 4) {
+      this.player.body.reset(this.target.x, this.target.y);
+      this.player.anims.play("S")
     }
+  }
 
-    if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-5);
+  fromRadianToDegree(radian) {
+    return radian * 180 / Math.PI
+  }
 
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(5);
-
+  detectDirection(degree) {
+    /*350 -> 360 ||  0 -> 10 returns S
+      10 -> 50 return SE
+     */
+    if ((degree > 350 && degree < 360) || (degree > 0 && degree < 10)) {
+      return "S"
     }
+    if (degree > 10 && degree < 80) return "SE"
+    if (degree > 80 && degree < 110) return "E"
+    if (degree > 110 && degree < 170) return "NE"
+    if (degree > 170 && degree < 190) return "N"
+    if (degree > 190 && degree < 260) return "NW"
+    if (degree > 260 && degree < 280) return "W"
+    if (degree > 280 && degree < 350) return "SW"
 
   }
 }
