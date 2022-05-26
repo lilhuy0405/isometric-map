@@ -1,8 +1,6 @@
-
 import * as Phaser from "phaser";
-import MyScene from "./MyScene";
-import TiledSence from "./TiledSence";
-import UsePlugin from "./UsePlugin";
+import MapScene from "./MapScene";
+
 
 export default class MyGame extends Phaser.Game {
   constructor() {
@@ -13,7 +11,7 @@ export default class MyGame extends Phaser.Game {
       backgroundColor: '#2d2d2d',
       pixelArt: true,
       scene: [
-        MyScene
+        MapScene
       ]
     };
     super(config);
