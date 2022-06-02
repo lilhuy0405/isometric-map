@@ -10,9 +10,17 @@ export default class MyGame extends Phaser.Game {
       height: 700,
       backgroundColor: '#2d2d2d',
       pixelArt: true,
+      parent: 'MapScene',
       scene: [
         MapScene
-      ]
+      ],
+      physics: {
+        default: 'arcade',
+        arcade: {
+          debug: true,
+          gravity: {x: 0, y: 0, z: 0}
+        }
+      }
     };
     super(config);
   }
