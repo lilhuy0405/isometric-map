@@ -44,7 +44,7 @@ export const isNumberBelongsToRange = (number, range) => {
   if (range[0] > range[1]) {
     throw new Error("isNumberBelongsToRange: invalid range start must larger than end")
   }
-  return number > range[0] && number < range [1];
+  return number >= range[0] && number <= range [1];
 }
 
 export const fromRadianToDegree = (radian) => {

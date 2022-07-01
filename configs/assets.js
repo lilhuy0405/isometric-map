@@ -3,15 +3,16 @@ import * as Phaser from "phaser";
 export const DATA = Object.freeze({
   MAP: {
     KEY: 'map',
-    PATH: 'assets/demo.json',
-    TILE_HEIGHT: 16,
+    PATH: 'assets/grass.json',
   },
 });
 export const borderOffset = new Phaser.Math.Vector2(100, 100);
 export const TILE_SETS = Object.freeze({
   TILES: {
     KEY: 'tiles',
-    PATH: 'assets/tileset.png'
+    PATH: 'assets/grass-tile.png',
+    WIDTH: 64,
+    HEIGHT: 64,
   }
 })
 

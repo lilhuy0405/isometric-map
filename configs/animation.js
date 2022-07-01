@@ -7,28 +7,28 @@ export const IDLE_ANIMATION_KEY_PREFIX = 'IDLE'
 
 export const DIRECTIONS = {
   S: {
-    degreeRanges: [[350, 360], [0, 10]]
+    degreeRanges: [[350, 360], [0, 9]]
   },
   SE: {
-    degreeRanges: [[10, 80]]
+    degreeRanges: [[10, 79]]
   },
   E: {
-    degreeRanges: [[80, 110]]
+    degreeRanges: [[80, 109]]
   },
   NE: {
-    degreeRanges: [[110, 170]]
+    degreeRanges: [[110, 169]]
   },
   N: {
-    degreeRanges: [[170, 190]]
+    degreeRanges: [[170, 189]]
   },
   NW: {
-    degreeRanges: [[190, 260]]
+    degreeRanges: [[190, 259]]
   },
   W: {
-    degreeRanges: [[260, 280]]
+    degreeRanges: [[260, 279]]
   },
   SW: {
-    degreeRanges: [[280, 350]]
+    degreeRanges: [[280, 349]]
   }
 
 }
