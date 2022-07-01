@@ -19,10 +19,10 @@ export const TILE_SETS = Object.freeze({
 export const SPRITES_SHEETS = Object.freeze({
   PLAYER: {
     KEY: 'player',
-    PATH: 'assets/run.png',
+    PATH: 'assets/hero80x80.png',
     FRAME_CONFIG: {
-      frameWidth: 2048 / 24,
-      frameHeight: 2048 / 12
+      frameWidth: 80,
+      frameHeight: 80
     }
   }
 })

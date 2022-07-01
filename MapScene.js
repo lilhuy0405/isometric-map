@@ -45,7 +45,7 @@ class MapScene extends Phaser.Scene {
     this.buildTileMap(0, TILE_SETS.TILES.KEY)
     // this.buildTileMap(1, TILE_SETS.TILES.KEY)
     //IMPORTANT: The order of the layer is important
-    this.monster = this.createMonster(7, 0)
+    this.monster = this.createMonster(13, 3)
     //build player
     this.player = this.add.existing(new Player(this, 16, 28));
 
@@ -86,7 +86,7 @@ class MapScene extends Phaser.Scene {
       this.playerPostionTxt.setText(`move from: [${startTile.x},${startTile.y}] to: [${targetTile.x},${targetTile.y}]`)
       // this.player.moveOnPath(targetTile, [0])
 
-      this.player.findPathAndMove(targetTile, [1]);
+      this.player.findPathAndMove(targetTile, [1], 0);
 
     })
 
@@ -132,7 +132,7 @@ class MapScene extends Phaser.Scene {
     const position = isoPoint.add(borderOffset);
     const monster = this.add.image(position.x, position.y, 'monster');
     monster.setOrigin(0, 0.5);
-    monster.setScale(0.1);
+    monster.setScale(0.2);
 
     return monster;
 

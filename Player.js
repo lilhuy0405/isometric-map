@@ -20,13 +20,17 @@ import * as EasyStar from "easystarjs";
 export default class Player extends Phaser.GameObjects.Sprite {
 
   constructor(scene, x, y) {
-    //TODO: FIND WAY TO GET OUT OF THIS HARD CODE VALUE: 32
-    const cartePoint = new Phaser.Math.Vector2(x * 32, y * 32);
+
+    super(scene);
+    this.setTexture(SPRITES_SHEETS.PLAYER.KEY);
+    console.log(this.scene.tileHeight)
+    const cartePoint = new Phaser.Math.Vector2(x * this.scene.tileHeight, y * this.scene.tileHeight);
     const isoPoint = cartesianToIsometric(cartePoint);
     const position = isoPoint.add(borderOffset);
-    super(scene, position.x, position.y, SPRITES_SHEETS.PLAYER.KEY);
+    this.setPosition(position.x, position.y);
+
     this.setOrigin(0, 0.5)
-    this.setScale(0.3)
+    this.setScale(1)
     this.scene.physics.add.existing(this);
     this.createAnimations();
     //some custom properties
@@ -112,11 +116,11 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.lastDirection = direction
   }
 
-  findPathAndMove(endTile, acceptableTiles) {
+  findPathAndMove(endTile, acceptableTiles, collisionLayerIndex) {
     const playerIsoPoint = new Phaser.Math.Vector2(this.x, this.y).subtract(borderOffset);
     const playerCartePt = isometricToCartesian(playerIsoPoint);
     let startTile = getTileCoordinates(playerCartePt, this.scene.tileHeight);
-    const mapData = this.scene.mapData.layers[0].data
+    const mapData = this.scene.mapData.layers[collisionLayerIndex].data
     const level = listToMatrix(mapData, this.scene.mapWidth)
     this.easystar.setGrid(level);
     this.easystar.setAcceptableTiles(acceptableTiles);
@@ -149,7 +153,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
         }
         if (newTarget.x < 0) newTarget.x = 0
         if (newTarget.y < 0) newTarget.y = 0
-        this.findPathAndMove(newTarget, acceptableTiles)
+        this.findPathAndMove(newTarget, acceptableTiles, collisionLayerIndex)
       } else {
         this.isMoving = true;
         this.moveCharacter(path);
@@ -174,7 +178,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
         }
       } catch (err) {
         console.log(err)
-        this.playerPostionTxt.setText(err.message)
         clearInterval(x)
         this.isMoving = false
       }
@@ -205,26 +208,134 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
 
   createAnimations() {
-    RUN_DIRECTIONS_ORDER.map((item, index) => {
-      const start = index * 5 + index
-      const end = start + 5
-      this.scene.anims.create({
-        key: `${RUN_ANIMATION_KEY_PREFIX}-${item}`,
-        frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start, end}),
-        repeat: -1,
-        frameRate: 6
-      });
+    // RUN_DIRECTIONS_ORDER.map((item, index) => {
+    //   const start = index * 5 + index
+    //   const end = start + 5
+    //   console.log(start, end)
+    //   this.scene.anims.create({
+    //     key: `${RUN_ANIMATION_KEY_PREFIX}-${item}`,
+    //     frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start, end}),
+    //     repeat: -1,
+    //     frameRate: 6
+    //   });
+    // })
+    //
+    // IDLE_DIRECTION_ORDER.map((item, index) => {
+    //   //idle in sprite sheets start from 240
+    //   const frameNumber = 240 + index
+    //   this.scene.anims.create({
+    //     key: `${IDLE_ANIMATION_KEY_PREFIX}-${item}`,
+    //     frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [frameNumber]}),
+    //     repeat: 1
+    //   });
+    // })
+    //TODO: GET RISK OF REPEAT ANIMATION
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-SE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 8, end: 11}),
+      repeat: -1,
+      frameRate: 4
     })
 
-    IDLE_DIRECTION_ORDER.map((item, index) => {
-      //idle in sprite sheets start from 240
-      const frameNumber = 240 + index
-      this.scene.anims.create({
-        key: `${IDLE_ANIMATION_KEY_PREFIX}-${item}`,
-        frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [frameNumber]}),
-        repeat: 1
-      });
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-N`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 12, end: 15}),
+      repeat: -1,
+      frameRate: 4
     })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-E`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 8, end: 11}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-NE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 12, end: 15}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-S`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 24, end: 27}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-NW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 28, end: 31}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-SW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 24, end: 27}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-W`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 28, end: 31}),
+      repeat: -1,
+      frameRate: 4
+    })
+    //idle animation
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-SE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [0]}),
+      repeat: 1
+    })
+
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-N`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [4]}),
+      repeat: 1
+    })
+
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-E`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [9]}),
+      repeat: 1
+    })
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-NE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [13]}),
+      repeat: 1
+    })
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-S`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [16]}),
+      repeat: 1
+    })
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-NW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [20]}),
+      repeat: 1
+    })
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-SW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [24]}),
+      repeat: 1
+    })
+
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-W`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [28]}),
+      repeat: 1
+    })
+
   }
 
 
