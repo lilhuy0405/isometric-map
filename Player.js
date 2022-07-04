@@ -1,7 +1,8 @@
 import * as Phaser from "phaser";
 import {
   cartesianToIsometric,
-  fromRadianToDegree, getTileCoordinates,
+  fromRadianToDegree,
+  getTileCoordinates,
   isNumberBelongsToRange,
   isometricToCartesian,
   listToMatrix
@@ -9,11 +10,7 @@ import {
 
 import {borderOffset, DATA, SPRITES_SHEETS} from "./configs/assets";
 import {
-  DIRECTIONS,
-  IDLE_ANIMATION_KEY_PREFIX,
-  IDLE_DIRECTION_ORDER,
-  RUN_ANIMATION_KEY_PREFIX,
-  RUN_DIRECTIONS_ORDER
+  DIRECTIONS, IDLE_ANIMATION_KEY_PREFIX, IDLE_DIRECTION_ORDER, RUN_ANIMATION_KEY_PREFIX, RUN_DIRECTIONS_ORDER
 } from "./configs/animation";
 import * as EasyStar from "easystarjs";
 
@@ -230,22 +227,42 @@ export default class Player extends Phaser.GameObjects.Sprite {
     //   });
     // })
     //TODO: GET RISK OF REPEAT ANIMATION
+    //SE + S
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-SE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 0, end: 3}),
+      repeat: -1,
+      frameRate: 4
+    })
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-S`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 0, end: 3}),
+      repeat: -1,
+      frameRate: 4
+    })
+
     this.scene.anims.create({
       key: `${RUN_ANIMATION_KEY_PREFIX}-SE`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 4, end: 7}),
+      repeat: -1,
+      frameRate: 4
+    })
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-S`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 4, end: 7}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    //NE + E
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-NE`,
       frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 8, end: 11}),
       repeat: -1,
       frameRate: 4
     })
-
     this.scene.anims.create({
-      key: `${RUN_ANIMATION_KEY_PREFIX}-N`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 12, end: 15}),
-      repeat: -1,
-      frameRate: 4
-    })
-
-    this.scene.anims.create({
-      key: `${RUN_ANIMATION_KEY_PREFIX}-E`,
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-E`,
       frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 8, end: 11}),
       repeat: -1,
       frameRate: 4
@@ -257,9 +274,49 @@ export default class Player extends Phaser.GameObjects.Sprite {
       repeat: -1,
       frameRate: 4
     })
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-E`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 12, end: 15}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    //SW + W
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-SW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 16, end: 19}),
+      repeat: -1,
+      frameRate: 4
+    })
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-W`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 16, end: 19}),
+      repeat: -1,
+      frameRate: 4
+    })
 
     this.scene.anims.create({
-      key: `${RUN_ANIMATION_KEY_PREFIX}-S`,
+      key: `${RUN_ANIMATION_KEY_PREFIX}-SW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 20, end: 23}),
+      repeat: -1,
+      frameRate: 4
+    })
+    this.scene.anims.create({
+      key: `${RUN_ANIMATION_KEY_PREFIX}-W`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 20, end: 23}),
+      repeat: -1,
+      frameRate: 4
+    })
+
+    //NW + N
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-NW`,
+      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 24, end: 27}),
+      repeat: -1,
+      frameRate: 4
+    })
+    this.scene.anims.create({
+      key: `${IDLE_ANIMATION_KEY_PREFIX}-N`,
       frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 24, end: 27}),
       repeat: -1,
       frameRate: 4
@@ -271,70 +328,19 @@ export default class Player extends Phaser.GameObjects.Sprite {
       repeat: -1,
       frameRate: 4
     })
-
     this.scene.anims.create({
-      key: `${RUN_ANIMATION_KEY_PREFIX}-SW`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 24, end: 27}),
-      repeat: -1,
-      frameRate: 4
-    })
-
-    this.scene.anims.create({
-      key: `${RUN_ANIMATION_KEY_PREFIX}-W`,
+      key: `${RUN_ANIMATION_KEY_PREFIX}-N`,
       frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {start: 28, end: 31}),
       repeat: -1,
       frameRate: 4
     })
-    //idle animation
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-SE`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [0]}),
-      repeat: 1
-    })
 
 
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-N`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [4]}),
-      repeat: 1
-    })
-
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-E`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [9]}),
-      repeat: 1
-    })
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-NE`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [13]}),
-      repeat: 1
-    })
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-S`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [16]}),
-      repeat: 1
-    })
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-NW`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [20]}),
-      repeat: 1
-    })
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-SW`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [24]}),
-      repeat: 1
-    })
-
-    this.scene.anims.create({
-      key: `${IDLE_ANIMATION_KEY_PREFIX}-W`,
-      frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [28]}),
-      repeat: 1
-    })
+    // this.scene.anims.create({
+    //   key: `${IDLE_ANIMATION_KEY_PREFIX}-W`,
+    //   frames: this.scene.anims.generateFrameNumbers(SPRITES_SHEETS.PLAYER.KEY, {frames: [28]}),
+    //   repeat: 1
+    // })
 
   }
 

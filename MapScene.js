@@ -23,7 +23,7 @@ class MapScene extends Phaser.Scene {
 
   preload() {
 
-    this.load.spritesheet(SPRITES_SHEETS.PLAYER.KEY, SPRITES_SHEETS.PLAYER.PATH, SPRITES_SHEETS.PLAYER.FRAME_CONFIG);
+    this.load.spritesheet(SPRITES_SHEETS.PLAYER.KEY, SPRITES_SHEETS.PLAYER.PATHS[7], SPRITES_SHEETS.PLAYER.FRAME_CONFIG);
     //TODO: Don't hard code the frame config
     this.load.spritesheet(TILE_SETS.TILES.KEY, TILE_SETS.TILES.PATH, {
       frameWidth: TILE_SETS.TILES.WIDTH,
