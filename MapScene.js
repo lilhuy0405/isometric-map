@@ -31,7 +31,11 @@ class MapScene extends Phaser.Scene {
     });
 
     this.load.spritesheet(SPRITES_SHEETS.PORTAL.KEY, SPRITES_SHEETS.PORTAL.PATH, SPRITES_SHEETS.PORTAL.FRAME_CONFIG);
-    this.load.spritesheet(SPRITES_SHEETS.MONSTERS.RAT.KEY, SPRITES_SHEETS.MONSTERS.RAT.PATH,SPRITES_SHEETS.MONSTERS.RAT.FRAME_CONFIG);
+    for (const [key, value] of Object.entries(SPRITES_SHEETS.MONSTERS)) {
+      this.load.spritesheet(value.KEY, value.PATH, value.FRAME_CONFIG);
+    }
+
+    // this.load.spritesheet(SPRITES_SHEETS.MONSTERS.RAT.KEY, SPRITES_SHEETS.MONSTERS.RAT.PATH, SPRITES_SHEETS.MONSTERS.RAT.FRAME_CONFIG);
     this.load.json(DATA.MAP.KEY, DATA.MAP.PATH);
     this.load.json(DATA.MAP2.KEY, DATA.MAP2.PATH);
 
@@ -39,14 +43,19 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-
-
     //Build Map automatically from json filed or add to graphics groups
     this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP.KEY);
     // this.buildTileMap(1, TILE_SETS.TILES.KEY)
     //IMPORTANT: The order of the layer is important
-    this.monster = this.createPortal(12, 0)
-    this.createMonster(10, 5)
+    this.portal = this.createPortal(12, 0)
+    let i = 8;
+    for (const [key, value] of Object.entries(SPRITES_SHEETS.MONSTERS)) {
+      console.log(key, value.KEY)
+      this.createMonster(i, 5, value.KEY);
+      i += 3;
+    }
+
+
     //build player
     this.player = this.add.existing(new Player(this, 16, 28));
 
@@ -98,7 +107,7 @@ class MapScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    const distanceToMonster = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.monster.x, this.monster.y);
+    const distanceToMonster = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.portal.x, this.portal.y);
     if (distanceToMonster < this.tileHeight * 2) {
 
       this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
@@ -109,7 +118,7 @@ class MapScene extends Phaser.Scene {
         this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP2.KEY);
         if (progress === 1) {
           this.cameras.main.fadeIn(500, 0, 0, 0, (camera, progress) => {
-            if(progress === 1) {
+            if (progress === 1) {
               this.player.isMoving = false;
             }
           })
@@ -153,27 +162,28 @@ class MapScene extends Phaser.Scene {
     }
   }
 
-  createMonster(x, y) {
+  createMonster(x, y, monsterKey) {
     //TODO: Move these 3 line of code to a function
     const cartePoint = new Phaser.Math.Vector2(x * this.tileHeight, y * this.tileHeight);
     const isoPoint = cartesianToIsometric(cartePoint);
     const position = isoPoint.add(borderOffset);
-    const monster = this.add.sprite(position.x, position.y, SPRITES_SHEETS.MONSTERS.RAT.KEY);
+    const monster = this.add.sprite(position.x, position.y,monsterKey);
     monster.setOrigin(0, 0.5);
     monster.setScale(1);
     //create animation
     const config = {
-      key: 'monsterAnim',
-      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.MONSTERS.RAT.KEY, { start: 0, end: 3 }),
+      key: monsterKey,
+      frames: this.anims.generateFrameNumbers(monsterKey, {start: 0, end: 3}),
       frameRate: 4,
       repeat: -1
     };
 
     this.anims.create(config);
-    monster.play('monsterAnim');
+    monster.play(monsterKey);
     return monster;
 
   }
+
   //TODO: move portal to unique class
   createPortal(x, y) {
     //TODO: Move these 3 line of code to a function
@@ -187,7 +197,7 @@ class MapScene extends Phaser.Scene {
     //create animation
     const config = {
       key: 'portalAnimation',
-      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.PORTAL.KEY, { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.PORTAL.KEY, {start: 0, end: 3}),
       frameRate: 4,
       repeat: -1
     };

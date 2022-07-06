@@ -54,6 +54,46 @@ export const SPRITES_SHEETS = Object.freeze({
         frameWidth: 100,
         frameHeight: 48
       }
+    },
+    GOBLIN: {
+      KEY: 'goblin',
+      PATH: 'assets/Goblin_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 97
+      }
+    },
+    GOBLIN_RAT_KEEPER: {
+      KEY: 'goblin-rat-keeper',
+      PATH: 'assets/Goblin_Rat_Keeper_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 97
+      }
+    },
+    GOBLIN_WITCH: {
+      KEY: 'goblin-witch',
+      PATH: 'assets/Goblin_Witch_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 97
+      }
+    },
+    GOBLIN_WIZARD: {
+      KEY: 'goblin-wizard',
+      PATH: 'assets/Goblin_Wizard_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 97
+      }
+    },
+    TROLL: {
+      KEY: 'troll',
+      PATH: 'assets/Troll_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 97
+      }
     }
   }
 })
