@@ -191,7 +191,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
     if (this.body.speed > 0) {
-
       const distance = Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y);
       // console.log(distance)
       if (distance < 5) {
@@ -201,6 +200,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.lastDirection = ""
       }
     }
+  }
+
+  resetPosition(tileCoordinates) {
+    const cartePoint = new Phaser.Math.Vector2(tileCoordinates.x * this.scene.tileHeight, tileCoordinates.y * this.scene.tileHeight);
+    const isoPoint = cartesianToIsometric(cartePoint);
+    const position = isoPoint.add(borderOffset);
+    this.body.reset(position.x, position.y);
   }
 
 

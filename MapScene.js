@@ -29,23 +29,24 @@ class MapScene extends Phaser.Scene {
       frameWidth: TILE_SETS.TILES.WIDTH,
       frameHeight: TILE_SETS.TILES.HEIGHT
     });
+
+    this.load.spritesheet(SPRITES_SHEETS.PORTAL.KEY, SPRITES_SHEETS.PORTAL.PATH, SPRITES_SHEETS.PORTAL.FRAME_CONFIG);
+    this.load.spritesheet(SPRITES_SHEETS.MONSTERS.RAT.KEY, SPRITES_SHEETS.MONSTERS.RAT.PATH,SPRITES_SHEETS.MONSTERS.RAT.FRAME_CONFIG);
     this.load.json(DATA.MAP.KEY, DATA.MAP.PATH);
+    this.load.json(DATA.MAP2.KEY, DATA.MAP2.PATH);
 
     this.load.image('monster', 'assets/goblin.png');
   }
 
   create() {
-    this.mapData = this.cache.json.get(DATA.MAP.KEY);
-    this.tileHeight = this.mapData.tileheight;
 
-    this.mapWidth = this.mapData.width;
-    this.mapHeight = this.mapData.height;
 
     //Build Map automatically from json filed or add to graphics groups
-    this.buildTileMap(0, TILE_SETS.TILES.KEY)
+    this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP.KEY);
     // this.buildTileMap(1, TILE_SETS.TILES.KEY)
     //IMPORTANT: The order of the layer is important
-    this.monster = this.createMonster(13, 3)
+    this.monster = this.createPortal(12, 0)
+    this.createMonster(10, 5)
     //build player
     this.player = this.add.existing(new Player(this, 16, 28));
 
@@ -97,11 +98,36 @@ class MapScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    const distanceToMonster = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.monster.x, this.monster.y);
+    if (distanceToMonster < this.tileHeight * 2) {
 
+      this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
+        this.player.isMoving = true;
+        this.mapGroup.destroy(true, true);
+        this.player.resetPosition({x: 16, y: 29})
+        this.player.anims.play('IDLE-NE')
+        this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP2.KEY);
+        if (progress === 1) {
+          this.cameras.main.fadeIn(500, 0, 0, 0, (camera, progress) => {
+            if(progress === 1) {
+              this.player.isMoving = false;
+            }
+          })
+        }
+      })
+
+
+    }
   }
 
   //create a group of graphics
-  buildTileMap(layerId = 0, tileSetKey) {
+  buildTileMap(layerId = 0, tileSetKey, mapKey) {
+    this.mapData = this.cache.json.get(mapKey);
+    this.tileHeight = this.mapData.tileheight;
+
+    this.mapWidth = this.mapData.width;
+    this.mapHeight = this.mapData.height;
+    this.mapGroup = this.add.group();
     const levelData = listToMatrix(this.mapData.layers[layerId].data, this.mapWidth);
     for (let i = 0; i < this.mapWidth; i++) {
       for (let j = 0; j < this.mapHeight; j++) {
@@ -120,6 +146,8 @@ class MapScene extends Phaser.Scene {
             isoPoint.y + borderOffset.y,
             tileSetKey, tileType - 1);
           tile.setOrigin(0, 0)
+          tile.setDepth(-1)
+          this.mapGroup.add(tile);
         }
       }
     }
@@ -130,11 +158,44 @@ class MapScene extends Phaser.Scene {
     const cartePoint = new Phaser.Math.Vector2(x * this.tileHeight, y * this.tileHeight);
     const isoPoint = cartesianToIsometric(cartePoint);
     const position = isoPoint.add(borderOffset);
-    const monster = this.add.image(position.x, position.y, 'monster');
+    const monster = this.add.sprite(position.x, position.y, SPRITES_SHEETS.MONSTERS.RAT.KEY);
     monster.setOrigin(0, 0.5);
-    monster.setScale(0.2);
+    monster.setScale(1);
+    //create animation
+    const config = {
+      key: 'monsterAnim',
+      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.MONSTERS.RAT.KEY, { start: 0, end: 3 }),
+      frameRate: 4,
+      repeat: -1
+    };
 
+    this.anims.create(config);
+    monster.play('monsterAnim');
     return monster;
+
+  }
+  //TODO: move portal to unique class
+  createPortal(x, y) {
+    //TODO: Move these 3 line of code to a function
+    const cartePoint = new Phaser.Math.Vector2(x * this.tileHeight, y * this.tileHeight);
+    const isoPoint = cartesianToIsometric(cartePoint);
+    const position = isoPoint.add(borderOffset);
+    const portal = this.add.sprite(position.x, position.y, SPRITES_SHEETS.PORTAL.KEY);
+    portal.setOrigin(0, 0.5);
+    portal.setScale(0.5, 0.4);
+
+    //create animation
+    const config = {
+      key: 'portalAnimation',
+      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.PORTAL.KEY, { start: 0, end: 3 }),
+      frameRate: 4,
+      repeat: -1
+    };
+
+    this.anims.create(config);
+    portal.play('portalAnimation');
+
+    return portal;
 
   }
 }

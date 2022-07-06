@@ -5,6 +5,10 @@ export const DATA = Object.freeze({
     KEY: 'map',
     PATH: 'assets/grass.json',
   },
+  MAP2: {
+    KEY: 'map2',
+    PATH: 'assets/grass-2.json',
+  }
 });
 export const borderOffset = new Phaser.Math.Vector2(100, 100);
 export const TILE_SETS = Object.freeze({
@@ -32,6 +36,24 @@ export const SPRITES_SHEETS = Object.freeze({
     FRAME_CONFIG: {
       frameWidth: 80,
       frameHeight: 80
+    }
+  },
+  PORTAL: {
+    KEY: 'portal',
+    PATH: 'assets/portal.png',
+    FRAME_CONFIG: {
+      frameWidth: 649 / 4,
+      frameHeight: 384
+    }
+  },
+  MONSTERS: {
+    RAT: {
+      KEY: 'rat',
+      PATH: 'assets/Rat_Swarm_MAP.png',
+      FRAME_CONFIG: {
+        frameWidth: 100,
+        frameHeight: 48
+      }
     }
   }
 })
