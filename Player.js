@@ -20,7 +20,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     super(scene);
     this.setTexture(SPRITES_SHEETS.PLAYER.KEY);
-    console.log(this.scene.tileHeight)
     const cartePoint = new Phaser.Math.Vector2(x * this.scene.tileHeight, y * this.scene.tileHeight);
     const isoPoint = cartesianToIsometric(cartePoint);
     const position = isoPoint.add(borderOffset);

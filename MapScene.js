@@ -1,5 +1,5 @@
 import * as  Phaser from "phaser";
-import {borderOffset, DATA, SPRITES_SHEETS, TILE_SETS} from "./configs/assets";
+import {borderOffset, DATA, MAP_OBJECT_TYPES, SPRITES_SHEETS, TILE_SETS} from "./configs/assets";
 import {
   cartesianToIsometric,
   getTileCoordinates,
@@ -7,6 +7,8 @@ import {
   listToMatrix
 } from "./utils";
 import Player from "./Player";
+import {IDLE_ANIMATION_KEY_PREFIX} from "./configs/animation";
+import MapPortal from "./MapPortal";
 
 
 class MapScene extends Phaser.Scene {
@@ -19,18 +21,22 @@ class MapScene extends Phaser.Scene {
 
     this.mapWidth = 0;
     this.mapHeight = 0;
+    this.heroSpawnPlaces = [];
+    this.portals = [];
+    this.heroSpawnPosition = ''
   }
 
   preload() {
 
     this.load.spritesheet(SPRITES_SHEETS.PLAYER.KEY, SPRITES_SHEETS.PLAYER.PATHS[7], SPRITES_SHEETS.PLAYER.FRAME_CONFIG);
-    //TODO: Don't hard code the frame config
+
     this.load.spritesheet(TILE_SETS.TILES.KEY, TILE_SETS.TILES.PATH, {
       frameWidth: TILE_SETS.TILES.WIDTH,
       frameHeight: TILE_SETS.TILES.HEIGHT
     });
-
+    //portal
     this.load.spritesheet(SPRITES_SHEETS.PORTAL.KEY, SPRITES_SHEETS.PORTAL.PATH, SPRITES_SHEETS.PORTAL.FRAME_CONFIG);
+    //monsters
     for (const [key, value] of Object.entries(SPRITES_SHEETS.MONSTERS)) {
       this.load.spritesheet(value.KEY, value.PATH, value.FRAME_CONFIG);
     }
@@ -47,17 +53,7 @@ class MapScene extends Phaser.Scene {
     this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP.KEY);
     // this.buildTileMap(1, TILE_SETS.TILES.KEY)
     //IMPORTANT: The order of the layer is important
-    this.portal = this.createPortal(12, 0)
-    let i = 8;
-    for (const [key, value] of Object.entries(SPRITES_SHEETS.MONSTERS)) {
-      console.log(key, value.KEY)
-      this.createMonster(i, 5, value.KEY);
-      i += 3;
-    }
 
-
-    //build player
-    this.player = this.add.existing(new Player(this, 16, 28));
 
     this.playerPostionTxt = this.add.text(borderOffset.x - 100, borderOffset.y - 20, "click on map to move player", {
       font: 'pixelFont',
@@ -96,7 +92,7 @@ class MapScene extends Phaser.Scene {
       this.playerPostionTxt.setText(`move from: [${startTile.x},${startTile.y}] to: [${targetTile.x},${targetTile.y}]`)
       // this.player.moveOnPath(targetTile, [0])
 
-      this.player.findPathAndMove(targetTile, [1], 0);
+      this.player.findPathAndMove(targetTile, [1, 2, 3, 4], 0);
 
     })
 
@@ -107,30 +103,49 @@ class MapScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    const distanceToMonster = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.portal.x, this.portal.y);
-    if (distanceToMonster < this.tileHeight * 2) {
+    this.portals.forEach(portal => {
+      const distancePlayerToThisPortal = Phaser.Math.Distance.Between(this.player.x, this.player.y, portal.x, portal.y);
 
-      this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
-        this.player.isMoving = true;
-        this.mapGroup.destroy(true, true);
-        this.player.resetPosition({x: 16, y: 29})
-        this.player.anims.play('IDLE-NE')
-        this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP2.KEY);
-        if (progress === 1) {
-          this.cameras.main.fadeIn(500, 0, 0, 0, (camera, progress) => {
-            if (progress === 1) {
-              this.player.isMoving = false;
-            }
-          })
-        }
-      })
+      if (distancePlayerToThisPortal < this.tileHeight * 2) {
+        this.cameras.main.fadeOut(0, 0, 0, 0, (camera, progress) => {
+          if (progress === 1) {
+            this.heroSpawnPosition = portal.spawnPosition;
+            this.buildTileMap(0, TILE_SETS.TILES.KEY, portal.to)
 
-
-    }
+            this.cameras.main.fadeIn(2000, 0, 0, 0, (camera, progress) => {
+              if (progress === 1) {
+                this.player.isMoving = false;
+              }
+            })
+          }
+        })
+      }
+    })
   }
 
   //create a group of graphics
+  //destroy old map if exist
+  //build old map base on json file
   buildTileMap(layerId = 0, tileSetKey, mapKey) {
+    if (this.player) {
+      this.player.destroy(true);
+    }
+    if (this.monsterGroup) {
+      this.monsterGroup.destroy(true, true);
+    }
+
+    if (this.mapGroup) {
+      this.mapGroup.destroy(true, true);
+    }
+    if (this.heroSpawnPlaces.length > 0) {
+      this.heroSpawnPlaces = [];
+    }
+    if (this.portals.length > 0) {
+      this.portals.forEach(portal => {
+        portal.destroy(true)
+      })
+      this.portals = [];
+    }
     this.mapData = this.cache.json.get(mapKey);
     this.tileHeight = this.mapData.tileheight;
 
@@ -160,6 +175,58 @@ class MapScene extends Phaser.Scene {
         }
       }
     }
+
+    this.monsterGroup = this.add.group();
+    const objectsLayer = this.mapData.layers.find(layer => layer.name === "Objects");
+    if (!objectsLayer) return;
+    objectsLayer.objects.forEach(mapObject => {
+      switch (mapObject.type) {
+        case MAP_OBJECT_TYPES.MONSTER:
+          const monsterKey = mapObject.properties.find(property => property.name === "monsterKey").value;
+          const monsterMapCartesianPosition = new Phaser.Math.Vector2(mapObject.x, mapObject.y).add({
+            x: mapObject.width,
+            y: mapObject.height
+          });
+          const monsterTileCoordinate = getTileCoordinates(monsterMapCartesianPosition, this.tileHeight);
+          const monster = this.createMonster(monsterTileCoordinate.x, monsterTileCoordinate.y, monsterKey);
+          this.monsterGroup.add(monster);
+          break;
+        case MAP_OBJECT_TYPES.PORTAL:
+          const portalCartesianPosition = new Phaser.Math.Vector2(mapObject.x, mapObject.y)
+          const portalTileCoordinate = getTileCoordinates(portalCartesianPosition, this.tileHeight);
+          const from = mapObject.properties.find(property => property.name === "from")?.value || "";
+          const to = mapObject.properties.find(property => property.name === "to")?.value || "";
+          const spawnPosition = mapObject.properties.find(property => property.name === "spawnPosition")?.value || "";
+          this.portals.push(this.add.existing(new MapPortal(this, portalTileCoordinate.x, portalTileCoordinate.y, {
+            from,
+            to,
+            spawnPosition
+          })));
+          break;
+        case MAP_OBJECT_TYPES.HERO_SPAWN:
+          const heroDirection = mapObject.properties.find(property => property.name === "heroDirection").value;
+          const position = mapObject.properties.find(property => property.name === "position").value;
+          const spawnCartesianPosition = new Phaser.Math.Vector2(mapObject.x, mapObject.y)
+          const spawnTileCoordinate = getTileCoordinates(spawnCartesianPosition, this.tileHeight);
+          this.heroSpawnPlaces.push({heroDirection, position, x: spawnTileCoordinate.x, y: spawnTileCoordinate.y});
+          break;
+      }
+    })
+
+    //build player
+    //detect spawn place
+    if (this.heroSpawnPlaces.length <= 0) return;
+    let spawnPlace = this.heroSpawnPlaces[0];
+    if (!this.heroSpawnPosition) {
+      this.player = this.add.existing(new Player(this, spawnPlace.x, spawnPlace.y));
+      this.player.anims.play(`${IDLE_ANIMATION_KEY_PREFIX}-${spawnPlace.heroDirection}`)
+      this.cameras.main.startFollow(this.player);
+      return;
+    }
+    spawnPlace = this.heroSpawnPlaces.find(place => place.position === this.heroSpawnPosition) || this.heroSpawnPlaces[0];
+    this.player = this.add.existing(new Player(this, spawnPlace.x, spawnPlace.y));
+    this.player.anims.play(`${IDLE_ANIMATION_KEY_PREFIX}-${spawnPlace.heroDirection}`)
+    this.cameras.main.startFollow(this.player);
   }
 
   createMonster(x, y, monsterKey) {
@@ -167,7 +234,7 @@ class MapScene extends Phaser.Scene {
     const cartePoint = new Phaser.Math.Vector2(x * this.tileHeight, y * this.tileHeight);
     const isoPoint = cartesianToIsometric(cartePoint);
     const position = isoPoint.add(borderOffset);
-    const monster = this.add.sprite(position.x, position.y,monsterKey);
+    const monster = this.add.sprite(position.x, position.y, monsterKey);
     monster.setOrigin(0, 0.5);
     monster.setScale(1);
     //create animation
@@ -184,30 +251,6 @@ class MapScene extends Phaser.Scene {
 
   }
 
-  //TODO: move portal to unique class
-  createPortal(x, y) {
-    //TODO: Move these 3 line of code to a function
-    const cartePoint = new Phaser.Math.Vector2(x * this.tileHeight, y * this.tileHeight);
-    const isoPoint = cartesianToIsometric(cartePoint);
-    const position = isoPoint.add(borderOffset);
-    const portal = this.add.sprite(position.x, position.y, SPRITES_SHEETS.PORTAL.KEY);
-    portal.setOrigin(0, 0.5);
-    portal.setScale(0.5, 0.4);
-
-    //create animation
-    const config = {
-      key: 'portalAnimation',
-      frames: this.anims.generateFrameNumbers(SPRITES_SHEETS.PORTAL.KEY, {start: 0, end: 3}),
-      frameRate: 4,
-      repeat: -1
-    };
-
-    this.anims.create(config);
-    portal.play('portalAnimation');
-
-    return portal;
-
-  }
 }
 
 export default MapScene;

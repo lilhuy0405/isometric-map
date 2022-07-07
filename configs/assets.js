@@ -2,13 +2,19 @@ import * as Phaser from "phaser";
 
 export const DATA = Object.freeze({
   MAP: {
-    KEY: 'map',
-    PATH: 'assets/grass.json',
+    KEY: 'map1',
+    PATH: 'assets/map1.json',
   },
   MAP2: {
     KEY: 'map2',
-    PATH: 'assets/grass-2.json',
+    PATH: 'assets/map2.json',
   }
+});
+export const MAP_OBJECT_TYPES = Object.freeze({
+  MONSTER: 'monsters',
+  PORTAL: 'portals',
+  HERO_SPAWN: 'heroSpawns',
+
 });
 export const borderOffset = new Phaser.Math.Vector2(100, 100);
 export const TILE_SETS = Object.freeze({
