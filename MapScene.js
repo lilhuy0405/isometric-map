@@ -51,9 +51,6 @@ class MapScene extends Phaser.Scene {
   create() {
     //Build Map automatically from json filed or add to graphics groups
     this.buildTileMap(0, TILE_SETS.TILES.KEY, DATA.MAP.KEY);
-    // this.buildTileMap(1, TILE_SETS.TILES.KEY)
-    //IMPORTANT: The order of the layer is important
-
 
     this.playerPostionTxt = this.add.text(borderOffset.x - 100, borderOffset.y - 20, "click on map to move player", {
       font: 'pixelFont',
