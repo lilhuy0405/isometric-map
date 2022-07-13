@@ -111,8 +111,57 @@
                  "type":"monsters",
                  "visible":true,
                  "width":64,
-                 "x":414.666666666667,
-                 "y":100
+                 "x":383.666666666667,
+                 "y":363
+                }, 
+                {
+                 "height":64,
+                 "id":4,
+                 "name":"PortalNE",
+                 "properties":[
+                        {
+                         "name":"from",
+                         "type":"string",
+                         "value":"map3"
+                        }, 
+                        {
+                         "name":"spawnPosition",
+                         "type":"string",
+                         "value":"SW"
+                        }, 
+                        {
+                         "name":"to",
+                         "type":"string",
+                         "value":"map6"
+                        }],
+                 "rotation":0,
+                 "type":"portals",
+                 "visible":true,
+                 "width":64,
+                 "x":547.4165,
+                 "y":-2.75
+                }, 
+                {
+                 "height":64,
+                 "id":5,
+                 "name":"heroSpawnNE",
+                 "properties":[
+                        {
+                         "name":"heroDirection",
+                         "type":"string",
+                         "value":"SW"
+                        }, 
+                        {
+                         "name":"position",
+                         "type":"string",
+                         "value":"NE"
+                        }],
+                 "rotation":0,
+                 "type":"heroSpawns",
+                 "visible":true,
+                 "width":64,
+                 "x":546.5835,
+                 "y":106.75
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -121,7 +170,7 @@
          "y":0
         }],
  "nextlayerid":3,
- "nextobjectid":4,
+ "nextobjectid":6,
  "orientation":"isometric",
  "renderorder":"right-down",
  "tiledversion":"1.8.4",

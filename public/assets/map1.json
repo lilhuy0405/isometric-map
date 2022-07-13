@@ -215,7 +215,7 @@
                 {
                  "height":64,
                  "id":28,
-                 "name":"HeroSpawnNW",
+                 "name":"HeroSpawnSE",
                  "properties":[
                         {
                          "name":"heroDirection",

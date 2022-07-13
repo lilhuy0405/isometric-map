@@ -20,6 +20,10 @@ export const DATA = Object.freeze({
   MAP5: {
     KEY: 'map5',
     PATH: 'assets/map5.json',
+  },
+  MAP6: {
+    KEY: 'map6',
+    PATH: 'assets/map6.json',
   }
 });
 export const MAP_OBJECT_TYPES = Object.freeze({

@@ -130,6 +130,55 @@
                  "width":64,
                  "x":499,
                  "y":717
+                }, 
+                {
+                 "height":64,
+                 "id":8,
+                 "name":"PortalNW",
+                 "properties":[
+                        {
+                         "name":"from",
+                         "type":"string",
+                         "value":"map2"
+                        }, 
+                        {
+                         "name":"spawnPosition",
+                         "type":"string",
+                         "value":"SE"
+                        }, 
+                        {
+                         "name":"to",
+                         "type":"string",
+                         "value":"map6"
+                        }],
+                 "rotation":0,
+                 "type":"portals",
+                 "visible":true,
+                 "width":64,
+                 "x":-13.1666666666668,
+                 "y":521.833333333333
+                }, 
+                {
+                 "height":64,
+                 "id":9,
+                 "name":"HeroSpawnNW",
+                 "properties":[
+                        {
+                         "name":"heroDirection",
+                         "type":"string",
+                         "value":"SE"
+                        }, 
+                        {
+                         "name":"position",
+                         "type":"string",
+                         "value":"NW"
+                        }],
+                 "rotation":0,
+                 "type":"heroSpawns",
+                 "visible":true,
+                 "width":64,
+                 "x":89.1666666666666,
+                 "y":519.5
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -138,7 +187,7 @@
          "y":0
         }],
  "nextlayerid":3,
- "nextobjectid":8,
+ "nextobjectid":10,
  "orientation":"isometric",
  "renderorder":"right-down",
  "tiledversion":"1.8.4",
