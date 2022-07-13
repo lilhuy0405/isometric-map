@@ -8,7 +8,7 @@ export default class MyGame extends Phaser.Game {
       type: Phaser.WEBGL,
       width: 1000,
       height: 700,
-      backgroundColor: '#2d2d2d',
+      backgroundColor: '#182830',
       pixelArt: true,
       parent: 'MapScene',
       scene: [

@@ -8,6 +8,18 @@ export const DATA = Object.freeze({
   MAP2: {
     KEY: 'map2',
     PATH: 'assets/map2.json',
+  },
+  MAP3: {
+    KEY: 'map3',
+    PATH: 'assets/map3.json',
+  },
+  MAP4: {
+    KEY: 'map4',
+    PATH: 'assets/map4.json',
+  },
+  MAP5: {
+    KEY: 'map5',
+    PATH: 'assets/map5.json',
   }
 });
 export const MAP_OBJECT_TYPES = Object.freeze({
