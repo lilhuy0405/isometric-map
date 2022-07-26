@@ -25,6 +25,7 @@ class MapScene extends Phaser.Scene {
     this.heroSpawnPlaces = [];
     this.portals = [];
     this.heroSpawnPosition = ''
+    this.cameraZoom = 1;
   }
 
   preload() {
@@ -65,7 +66,7 @@ class MapScene extends Phaser.Scene {
     });
     //setup camera;
     this.cameras.main.startFollow(this.player);
-    this.cameras.main.setZoom(1)
+    this.cameras.main.setZoom(this.cameraZoom)
 
     //move characters by click
 
@@ -73,10 +74,10 @@ class MapScene extends Phaser.Scene {
     this.lastDirection = ""
 
     this.input.on(Phaser.Input.Events.POINTER_UP, (pointer) => {
-      if (this.player.isMoving) {
-        console.log("player is moving")
-        return
-      }
+      // if (this.player.isMoving) {
+      //   console.log("player is moving")
+      //   return
+      // }
       const {worldX, worldY} = pointer
 
       const playerIsoPoint = new Phaser.Math.Vector2(this.player.x, this.player.y).subtract(borderOffset);
@@ -183,7 +184,6 @@ class MapScene extends Phaser.Scene {
 
     this.monsterGroup = this.add.group();
     const objectsLayer = this.mapData.layers.find(layer => layer.name === "Objects");
-    console.log('objectsLayer', objectsLayer)
     if (!objectsLayer) return;
     objectsLayer.objects.forEach(mapObject => {
       switch (mapObject.type) {
@@ -236,7 +236,7 @@ class MapScene extends Phaser.Scene {
     this.player = this.add.existing(new Player(this, spawnPlace.x, spawnPlace.y));
     this.player.anims.play(`${IDLE_ANIMATION_KEY_PREFIX}-${spawnPlace.heroDirection}`)
     this.cameras.main.startFollow(this.player);
-    this.cameras.main.setZoom(1)
+    this.cameras.main.setZoom(this.cameraZoom)
   }
 
   createMonster(x, y, monsterKey) {

@@ -51,8 +51,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
         break
       }
     }
-    console.log(targetDirection)
-    return targetDirection;
+    return targetDirection || this.lastDirection;
   }
 
 
@@ -98,7 +97,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     const isoPoint = cartesianToIsometric(cartePoint);
     this.target = isoPoint.add(borderOffset);
 
-    this.scene.physics.moveToObject(this, this.target, 100, 400);
+    const res = this.scene.physics.moveToObject(this, this.target, 100, 400);
     //calculate angle between move vector and Oy
     const distance = Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y);
     const cosAngle = (this.target.y - this.y) / distance
@@ -113,6 +112,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
   }
 
   findPathAndMove(endTile, acceptableTiles, collisionLayerIndex) {
+
     const playerIsoPoint = new Phaser.Math.Vector2(this.x, this.y).subtract(borderOffset);
     const playerCartePt = isometricToCartesian(playerIsoPoint);
     let startTile = getTileCoordinates(playerCartePt, this.scene.tileHeight);
@@ -122,18 +122,12 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.easystar.setAcceptableTiles(acceptableTiles);
     this.easystar.enableDiagonals();
     this.easystar.enableCornerCutting();
-    // this.easystar.avoidAdditionalPoint(7, 0);
-    // this.easystar.avoidAdditionalPoint(6, 0);
-    // this.easystar.avoidAdditionalPoint(8, 0);
-    // this.easystar.avoidAdditionalPoint(9, 0);
-    //
-    // this.easystar.avoidAdditionalPoint(7, 1);
-    // this.easystar.avoidAdditionalPoint(6, 1);
-    // this.easystar.avoidAdditionalPoint(8, 1);
-    // this.easystar.avoidAdditionalPoint(9, 1);
+    this.easystar.setIterationsPerCalculation(100);
 
 
     this.easystar.findPath(startTile.x, startTile.y, endTile.x, endTile.y, (path) => {
+      clearInterval(this.moveInterval)
+      this.moveInterval = null;
       if (path === null) {
         const newTarget = endTile;
         if (startTile.x < endTile.x) {
@@ -159,14 +153,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
   }
 
   moveCharacter(path) {
-    // Sets up a list of tweens, one for each tile to walk, that will be chained by the timeline
-    const timeStep = 200;
+    const timeStep = 120;
 
-    const x = setInterval(() => {
+    this.moveInterval = setInterval(() => {
       try {
         // this.isMoving = true;
         if (path.length === 0) {
-          clearInterval(x)
+          clearInterval(this.moveInterval)
           this.isMoving = false;
         } else {
           const tile = path.shift()
@@ -174,17 +167,31 @@ export default class Player extends Phaser.GameObjects.Sprite {
         }
       } catch (err) {
         console.log(err)
-        clearInterval(x)
+        clearInterval(this.moveInterval)
         this.isMoving = false
       }
     }, timeStep);
-    // this.anims.play('RUN-S')
-    // const timeLine = this.scene.tweens.timeline({
+
+
+    // Sets up a list of tweens, one for each tile to walk, that will be chained by the timeline
+
+    // let tweens = [];
+    // for (let i = 0; i < path.length - 1; i++) {
+    //   const ex = path[i + 1].x;
+    //   const ey = path[i + 1].y;
+    //   const cartePoint = new Phaser.Math.Vector2(ex * this.scene.tileHeight, ey * this.scene.tileHeight);
+    //   const isoPoint = cartesianToIsometric(cartePoint);
+    //   isoPoint.add(borderOffset);
+    //   tweens.push({
+    //     targets: this,
+    //     x: {value: isoPoint.x, duration: 200},
+    //     y: {value: isoPoint.y, duration: 200}
+    //   });
+    // }
+    //
+    // this.scene.tweens.timeline({
     //   tweens: tweens
     // });
-
-
-    // timeLine.play();
   };
 
   preUpdate(time, delta) {
